@@ -6,29 +6,27 @@ from myneat.config import default_config
 
 
 population = Population(default_config)
-
-# TODO: make it easier to initialize. How do other implementations do this?
-genomes = []
-genome = Genome.new(default_config)
-genome.init()
-for _ in range(default_config.pop_size):
-    genomes.append(genome.copy())
-population.init(genomes)
+population.init()
 
 
 def evaluate_genome(individual):
-    """ Evaluate genome on its ability to maximize number of connections n(n-1)/2 per number of nodes """
+    """
+    Evaluate genome on its ability to maximize number of connections per number of nodes
+    Max number of connections, where nodes can connect to themselves, given n nodes = n(n-1)/2 + n
+    """
     num_nodes = len(individual.genome.nodes)
-    max_conns = num_nodes*(num_nodes-1)/2  # compute maximum possible number of connections given this many nodes
-    return len(individual.genome.connections) - max_conns
+    max_conns = num_nodes*(num_nodes-1)/2 + num_nodes  # maximum possible number of connections given this many nodes
+
+    num_conns = len(individual.genome.connections)
+    return num_conns / max_conns
 
 
 gen = 0
-while gen < 500:
+while True:
     population.evaluate(evaluate_genome)
     print(f"Fittest conns: {len(population.fittest.genome.connections)}, "
           f"enabled: {len([c for c in population.fittest.genome.connections.values() if c.enabled])}, "
           f"nodes: {len(population.fittest.genome.nodes)}, Species: {len(population.species_set.species)}, "
           f"Pop: {len(population.individuals)}, ")
-    print(population.fittest.genome.connections)
+    print("\t" + ", ".join(f"{k[0]}->{k[1]}" for k in population.fittest.genome.connections.keys()))
     gen += 1

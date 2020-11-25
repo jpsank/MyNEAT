@@ -132,15 +132,15 @@ class Config:
         mutate_rate=0.01
     )
 
-    # feed_forward = False
-    initial_connection = "full"
+    feed_forward = False  # Not used
+    initial_connection = "full"  # Not used
 
     # node add/remove rates
     node_add_prob = 0.2
     node_delete_prob = 0.2
 
     # network parameters
-    # num_hidden = 0
+    num_hidden = 0  # Not used
     num_inputs = 1
     num_outputs = 1
 
@@ -155,6 +155,10 @@ class Config:
         replace_rate=0.0
     )
 
+    # structural mutations
+    single_structural_mutation = False  # If enabled, only one structural mutation per genome per "generation"
+    structural_mutation_surer = False  # If enabled, perform alternative structural mutations on failure
+
     # connection weight options
     weight_config = FloatConfig(
         init_mean=0.0,
@@ -167,16 +171,19 @@ class Config:
     )
 
     # genome compatibility options
-    compatibility_excess_coefficient = 1.0  # c1
-    compatibility_disjoint_coefficient = 1.0  # c2
+    compatibility_disjoint_coefficient = 1.0  # c2, takes the places of both c1 and c2
     compatibility_weight_coefficient = 0.5  # c3
-    compatibility_threshold = 8.0
+    compatibility_threshold = 3.0
 
     def __init__(self):
-        self.innovation_counter = Counter()
-        self.node_id_counter = Counter()
+        self.node_key_counter = Counter()
         self.genome_id_counter = Counter()
         self.species_id_counter = Counter()
+
+        # By convention, input pins have negative keys, and the output
+        # pins have keys 0,1,...
+        self.input_keys = [-i - 1 for i in range(self.num_inputs)]
+        self.output_keys = [i for i in range(self.num_outputs)]
 
 
 default_config = Config()

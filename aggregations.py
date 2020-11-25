@@ -1,6 +1,6 @@
 """
-Has the built-in aggregation functions
-Largely copied from NEAT-Python
+Has the built-in aggregation functions.
+Largely copied from NEAT-Python.
 """
 
 from operator import mul

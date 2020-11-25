@@ -1,6 +1,6 @@
 """
-Has the built-in activation functions
-Largely copied from NEAT-Python
+Has the built-in activation functions.
+Largely copied from NEAT-Python.
 """
 import math
 
