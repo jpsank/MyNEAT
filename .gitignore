@@ -1,7 +1,10 @@
 
 __pycache__/
 
-todo.txt
 .DS_Store
 extra/
+
+todo.txt
+test3.py
+population-legacy.py
 

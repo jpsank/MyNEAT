@@ -77,7 +77,7 @@ def cube_activation(x):
     return x ** 3
 
 
-activation_functions = {
+activation_defs = {
     "sigmoid": sigmoid_activation,
     "tanh": tanh_activation,
     "sin": sin_activation,

@@ -4,17 +4,9 @@ Also contains counters for id's and innovation numbers.
 Configuration parameters themselves are largely copied from NEAT-Python.
 """
 
+from itertools import count
 from dataclasses import dataclass
 import random
-
-
-class Counter:
-    def __init__(self):
-        self.last = 0
-
-    def __call__(self):
-        self.last += 1
-        return self.last
 
 
 def clamp(value, low, high):
@@ -95,8 +87,6 @@ class Config:
     Contains configuration and counters for a simulation
     """
 
-    pop_size = 100
-
     # node activation options
     activation_config = StringConfig(
         default="tanh",
@@ -173,12 +163,30 @@ class Config:
     # genome compatibility options
     compatibility_disjoint_coefficient = 1.0  # c2, takes the places of both c1 and c2
     compatibility_weight_coefficient = 0.5  # c3
-    compatibility_threshold = 3.0
+
+    # dynamic compatibility threshold
+    compat_threshold_initial = 3.0  # initial compatibility threshold value
+    compat_threshold_modifier = 0.1  # amount by which to adjust the compat threshold if num of species is off-target
+    compat_threshold_min = 0.5  # minimum value of compatibility threshold
+    target_num_species = 50  # dynamic compatibility threshold used to maintain this target
+
+    # stagnation
+    max_stagnation = 15  # how long before a species can be removed for not improving its species-fitness
+    species_elitism = 0  # number of species with highest species-fitness are protected from stagnation
+    reset_on_extinction = True  # init new population if all species simultaneously become extinct due to stagnation
+
+    # rt-NEAT
+    pop_size = 100  # population size P
+    minimum_age = 500  # minimum time alive m before a newly added organism is eligible to be removed
+    ineligibility_fraction = 0.5  # fraction I of population at any given time that should be ineligible
+    replacement_frequency = \
+        minimum_age/(pop_size*ineligibility_fraction)  # law of eligibility; ticks between replacements n = m/(P*I)
+    reorganization_frequency = 5  # reorganize species every x replacements (x=5 in NERO)
 
     def __init__(self):
-        self.node_key_counter = Counter()
-        self.genome_id_counter = Counter()
-        self.species_id_counter = Counter()
+        self.node_key_counter = count()
+        self.genome_id_counter = count()
+        self.species_id_counter = count()
 
         # By convention, input pins have negative keys, and the output
         # pins have keys 0,1,...

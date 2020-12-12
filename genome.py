@@ -6,7 +6,7 @@ Heavily influenced by NEAT-Python.
 import random
 
 from myneat.genes import NodeGene, ConnectionGene
-from myneat.config import Config, default_config
+from myneat.config import Config
 
 
 class Genome:
@@ -35,8 +35,12 @@ class Genome:
 
     @staticmethod
     def crossover(parent1, parent2):
-        """ Create a new genome by crossover from two parent genomes. Assumes parent1 is the fitter parent. """
-        # assert parent1.config == parent2.config, "Parent genomes must have same config for crossover"
+        """
+        Create a new genome by crossover from two parent genomes
+        :param parent1: fitter parent
+        :param parent2: less fit parent
+        :return: newly generated child genome
+        """
 
         child = Genome.new(parent1.config)
 
@@ -259,9 +263,4 @@ class Genome:
     def size(self):
         """ Returns genome 'complexity', taken to be number of nodes + number of connections """
         return len(self.nodes) + len(self.connections)
-
-
-if __name__ == '__main__':
-    genome = Genome.new(default_config)
-    genome.init()
 

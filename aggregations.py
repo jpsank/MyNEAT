@@ -37,7 +37,7 @@ def mean_aggregation(x):
     return mean(x)
 
 
-aggregation_functions = {
+aggregation_defs = {
     "product": product_aggregation,
     "sum": sum_aggregation,
     "max": max_aggregation,
