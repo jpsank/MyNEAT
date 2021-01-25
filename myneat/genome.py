@@ -5,8 +5,8 @@ Heavily influenced by NEAT-Python.
 
 import random
 
-from myneat.genes import NodeGene, ConnectionGene
-from myneat.config import Config
+from myneat.myneat.genes import NodeGene, ConnectionGene
+from myneat.myneat.config import Config
 
 
 class Genome:
@@ -20,7 +20,7 @@ class Genome:
     @staticmethod
     def new(config: Config):
         """ Create an altogether new genome for the given configuration. """
-        return Genome(config.genome_id_counter(), config)
+        return Genome(next(config.genome_id_counter), config)
 
     def init(self):
         """ Connect a genome based on its configuration. """

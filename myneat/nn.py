@@ -2,9 +2,9 @@
 
 from collections import defaultdict
 
-from myneat.genome import Genome
-from myneat.activations import activation_defs
-from myneat.aggregations import aggregation_defs
+from myneat.myneat.genome import Genome
+from myneat.myneat.activations import activation_defs
+from myneat.myneat.aggregations import aggregation_defs
 
 
 def required_for_output(inputs, outputs, connections):

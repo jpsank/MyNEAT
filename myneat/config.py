@@ -131,8 +131,8 @@ class Config:
 
     # network parameters
     num_hidden = 0  # Not used
-    num_inputs = 1
-    num_outputs = 1
+    num_inputs = 10
+    num_outputs = 5
 
     # node response options
     response_config = FloatConfig(
@@ -161,27 +161,31 @@ class Config:
     )
 
     # genome compatibility options
-    compatibility_disjoint_coefficient = 1.0  # c2, takes the places of both c1 and c2
+    compatibility_disjoint_coefficient = 1.0  # c2, takes the place of both c1 and c2
     compatibility_weight_coefficient = 0.5  # c3
 
     # dynamic compatibility threshold
     compat_threshold_initial = 3.0  # initial compatibility threshold value
     compat_threshold_modifier = 0.1  # amount by which to adjust the compat threshold if num of species is off-target
-    compat_threshold_min = 0.5  # minimum value of compatibility threshold
+    compat_threshold_min = 0.1  # minimum value of compatibility threshold
     target_num_species = 50  # dynamic compatibility threshold used to maintain this target
 
     # stagnation
-    max_stagnation = 15  # how long before a species can be removed for not improving its species-fitness
+    max_stagnation = 15  # how long before a species can be removed for not improving its species-fitness (15)
     species_elitism = 0  # number of species with highest species-fitness are protected from stagnation
     reset_on_extinction = True  # init new population if all species simultaneously become extinct due to stagnation
 
-    # rt-NEAT
-    pop_size = 100  # population size P
-    minimum_age = 500  # minimum time alive m before a newly added organism is eligible to be removed
-    ineligibility_fraction = 0.5  # fraction I of population at any given time that should be ineligible
-    replacement_frequency = \
-        minimum_age/(pop_size*ineligibility_fraction)  # law of eligibility; ticks between replacements n = m/(P*I)
-    reorganization_frequency = 5  # reorganize species every x replacements (x=5 in NERO)
+    # real-time NEAT
+    #   Based on law of eligibility: n = m/(P*I)
+    #       n: replacement frequency (number of ticks between replacements)
+    #       m: minimum age (minimum time alive, in ticks, before an agent is eligible to be removed)
+    #       P: population size
+    #       I: preferred ineligibility fraction (fraction of population at any given time that should be ineligible)
+    pop_size = 100
+    minimum_age = 500
+    ineligibility_fraction = 0.5
+    replacement_frequency = round(minimum_age / (pop_size * ineligibility_fraction))
+    reorganization_frequency = 5  # adjust compat threshold & reassign species every _ replacements (=5 in NERO)
 
     def __init__(self):
         self.node_key_counter = count()

@@ -1,22 +1,22 @@
 """ Demonstrate multiple interacting populations with distinct genome configurations in one simulation (WIP). """
 
-from myneat.population import Individual, Population
-from myneat.config import Config
+from myneat.myneat.population import Agent, Population
+from myneat.myneat.config import Config
 
 
-class Wolf(Individual):
+class Wolf(Agent):
     def __init__(self, x, y, genome):
         super().__init__(genome)
         self.x, self.y = x, y
 
 
-class Elk(Individual):
+class Elk(Agent):
     def __init__(self, x, y, genome):
         super().__init__(genome)
         self.x, self.y = x, y
 
 
-class Grass(Individual):
+class Grass(Agent):
     def __init__(self, x, y, genome):
         super().__init__(genome)
         self.x, self.y = x, y

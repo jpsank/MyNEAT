@@ -1,7 +1,7 @@
 import random
 from dataclasses import dataclass
 
-from myneat.config import Config
+from myneat.myneat.config import Config
 
 
 @dataclass
@@ -19,7 +19,7 @@ class NodeGene:
     @staticmethod
     def new(config: Config, key=None):
         """ Create a new gene with values initialized by config. """
-        return NodeGene(key=config.node_key_counter() if key is None else key,
+        return NodeGene(key=next(config.node_key_counter) if key is None else key,
                         response=config.response_config.new(),
                         bias=config.bias_config.new(),
                         activation=config.activation_config.new(),

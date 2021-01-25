@@ -3,8 +3,8 @@
 import random
 from itertools import count
 
-from myneat.genome import Genome
-from myneat.config import Config
+from myneat.myneat.genome import Genome
+from myneat.myneat.config import Config
 
 
 class GenomeDistanceCache:
@@ -33,6 +33,7 @@ class Species:
         self.id = sid
         self.created = ticks
         self.last_improved = ticks
+        self.best_fitness = None
         self.members = set()
 
         self.add(mascot)
@@ -58,10 +59,6 @@ class Species:
         """ Return k random members chosen probabilistically based on fitness """
         return random.choices(self.members, weights=[m.fitness for m in self.members], k=k)
 
-    def size(self):
-        """ Return size of species """
-        return len(self.members)
-
 
 class SpeciesSet:
     def __init__(self, config: Config):
@@ -71,19 +68,17 @@ class SpeciesSet:
 
         self.compat_threshold = config.compat_threshold_initial
 
-    def new_species(self, mascot):
+    def new_species(self, mascot, ticks):
         """ Create an entirely new species with given mascot """
-        species = Species(next(self.indexer), mascot)
+        species = Species(next(self.indexer), mascot, ticks)
         self.species_dict[species.id] = species
         return species
 
     def adjust_compat_threshold(self):
         """ Adjust dynamic compatibility threshold to better fit target number of species """
-        num_species = len(self.species_dict)
-        if num_species > self.config.target_num_species:
-            self.compat_threshold += self.config.compat_threshold_modifier
-        elif num_species < self.config.target_num_species:
-            self.compat_threshold -= self.config.compat_threshold_modifier
+
+        diff = len(self.species_dict) - self.config.target_num_species
+        self.compat_threshold += (diff / self.config.pop_size) * self.config.compat_threshold_modifier
 
         if self.compat_threshold < self.config.compat_threshold_min:
             self.compat_threshold = self.config.compat_threshold_min
@@ -93,7 +88,7 @@ class SpeciesSet:
         for species in self.species_dict.values():
             species.reset()
 
-    def speciate(self, agents):
+    def speciate(self, agents, ticks):
         """ Speciate agents """
 
         # Reset all species but preserve mascots
@@ -116,16 +111,19 @@ class SpeciesSet:
 
             # If not compatible with any species, create new species and assign as mascot
             if not found:
-                self.new_species(agent)
+                self.new_species(agent, ticks)
 
     def remove_empty(self):
         """ Remove empty species """
         for sid, species in self.species_dict.items():
-            if species.size() == 0:
+            if len(species.members) == 0:
                 del self.species_dict[sid]
 
     def random_species(self, k=1):
         """ Choose species probabilistically based on average fitness """
         all_species = list(self.species_dict.values())
         return random.choices(all_species, weights=[s.fitness() for s in all_species], k=k)
+
+    def size(self):
+        return len(self.species_dict)
 
