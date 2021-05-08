@@ -82,7 +82,7 @@ class StringConfig:
 
 
 @dataclass
-class Config:
+class BaseConfig:
     """
     Contains configuration and counters for a simulation
     """
@@ -131,8 +131,8 @@ class Config:
 
     # network parameters
     num_hidden = 0  # Not used
-    num_inputs = 10
-    num_outputs = 5
+    num_inputs = 2
+    num_outputs = 1
 
     # node response options
     response_config = FloatConfig(
@@ -175,28 +175,16 @@ class Config:
     species_elitism = 0  # number of species with highest species-fitness are protected from stagnation
     reset_on_extinction = True  # init new population if all species simultaneously become extinct due to stagnation
 
-    # real-time NEAT
-    #   Based on law of eligibility: n = m/(P*I)
-    #       n: replacement frequency (number of ticks between replacements)
-    #       m: minimum age (minimum time alive, in ticks, before an agent is eligible to be removed)
-    #       P: population size
-    #       I: preferred ineligibility fraction (fraction of population at any given time that should be ineligible)
     pop_size = 100
-    minimum_age = 500
-    ineligibility_fraction = 0.5
-    replacement_frequency = round(minimum_age / (pop_size * ineligibility_fraction))
-    reorganization_frequency = 5  # adjust compat threshold & reassign species every _ replacements (=5 in NERO)
 
-    def __init__(self):
-        self.node_key_counter = count()
-        self.genome_id_counter = count()
-        self.species_id_counter = count()
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            self.__setattr__(k, v)
 
+        self.node_key_indexer = count()
         # By convention, input pins have negative keys, and the output
         # pins have keys 0,1,...
         self.input_keys = [-i - 1 for i in range(self.num_inputs)]
         self.output_keys = [i for i in range(self.num_outputs)]
 
-
-default_config = Config()
 

@@ -1,11 +1,34 @@
 import random
 from dataclasses import dataclass
 
-from myneat.myneat.config import Config
+from neat.base.config import BaseConfig
+
+
+class Gene:
+    """
+    Base class for all genes
+    """
+    @staticmethod
+    def new(key, config):
+        pass
+
+    @staticmethod
+    def crossover(g1, g2):
+        pass
+
+    def mutate(self, config):
+        pass
+
+    def copy(self):
+        pass
+
+    @staticmethod
+    def distance(g1, g2, config):
+        pass
 
 
 @dataclass
-class NodeGene:
+class NodeGene(Gene):
     """
     Base class for CPPN node genes
     out = activation(bias + response * aggregation(inputs))
@@ -17,9 +40,9 @@ class NodeGene:
     aggregation: str
 
     @staticmethod
-    def new(config: Config, key=None):
+    def new(key, config: BaseConfig):
         """ Create a new gene with values initialized by config. """
-        return NodeGene(key=next(config.node_key_counter) if key is None else key,
+        return NodeGene(key=key,
                         response=config.response_config.new(),
                         bias=config.bias_config.new(),
                         activation=config.activation_config.new(),
@@ -67,7 +90,7 @@ class ConnectionGene:
         self.enabled = False
 
     @staticmethod
-    def new(config: Config, key, weight=None):
+    def new(key, config: BaseConfig, weight=None):
         """ Create a new gene with values initialized by config. """
         return ConnectionGene(key=key,
                               weight=config.weight_config.new() if weight is None else weight,

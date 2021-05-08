@@ -2,9 +2,9 @@
 
 from collections import defaultdict
 
-from myneat.myneat.genome import Genome
-from myneat.myneat.activations import activation_defs
-from myneat.myneat.aggregations import aggregation_defs
+from neat.base.genome import BaseGenome
+from neat.base.activations import activation_defs
+from neat.base.aggregations import aggregation_defs
 
 
 def required_for_output(inputs, outputs, connections):
@@ -51,7 +51,7 @@ class RecurrentNetwork:
         self.o_values = dict(self.i_values)
 
     @staticmethod
-    def new(genome: Genome):
+    def new(genome: BaseGenome):
         """ Receives a genome and returns its phenotype (a RecurrentNetwork). """
         required = required_for_output(genome.config.input_keys, genome.config.output_keys, genome.connections.keys())
 

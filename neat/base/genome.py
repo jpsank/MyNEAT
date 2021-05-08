@@ -5,89 +5,107 @@ Heavily influenced by NEAT-Python.
 
 import random
 
-from myneat.myneat.genes import NodeGene, ConnectionGene
-from myneat.myneat.config import Config
+from neat.base.genes import NodeGene, ConnectionGene
+from neat.base.data import Index
 
 
-class Genome:
-    def __init__(self, gid, config: Config):
-        self.id = gid
-        self.config: Config = config
+class GeneIndex(Index):
+    def __init__(self, gene_type):
+        super().__init__("key")
+        self.gene_type = gene_type
 
-        self.nodes: {int: NodeGene} = {}
-        self.connections: {int: ConnectionGene} = {}
+    def new(self, *args, **kwargs):
+        """ Create and add a new item with given parameters. """
+        item = self.gene_type.new(*args, **kwargs)
+        self.add(item)
+        return item
 
     @staticmethod
-    def new(config: Config):
-        """ Create an altogether new genome for the given configuration. """
-        return Genome(next(config.genome_id_counter), config)
+    def compare(genes1, genes2, config):
+        homologous_distance = 0.0
+        disjoint = 0
+        if genes1 or genes2:
+            for k2 in genes2.keys():
+                if k2 not in genes1:
+                    disjoint += 1
 
-    def init(self):
-        """ Connect a genome based on its configuration. """
-        for k in self.config.input_keys:
-            self.nodes[k] = self.create_node(k)
-        for k in self.config.output_keys:
-            self.nodes[k] = self.create_node(k)
-
-        for k1 in self.config.input_keys:
-            for k2 in self.config.output_keys:
-                self.create_connection((k1, k2))
+            for k1, g1 in genes1.items():
+                g2 = genes2.get(k1)
+                if g2 is None:
+                    disjoint += 1
+                else:
+                    # Homologous genes compute their own distance value.
+                    homologous_distance += type(g1).distance(g1, g2, config)
+        return homologous_distance, disjoint
 
     @staticmethod
     def crossover(parent1, parent2):
         """
-        Create a new genome by crossover from two parent genomes
-        :param parent1: fitter parent
-        :param parent2: less fit parent
-        :return: newly generated child genome
+        Initialize new gene list by crossover from two parent gene indexes
+        :param parent1: fitter parent gene index
+        :param parent2: less fit parent gene index
+        :return: new child gene index
         """
-
-        child = Genome.new(parent1.config)
-
-        # Inherit connection genes
-        for key, conn1 in parent1.connections.items():
-            conn2 = parent2.connections.get(key)
-            if conn2 is None:
-                # Excess or disjoint gene; copy from the fittest parent.
-                child.add_connection(conn1.copy())
+        assert (gene_type := parent1.gene_type) == parent2.gene_type
+        child = GeneIndex(gene_type)
+        for key, gene1 in parent1.genes.items():
+            gene2 = parent2.get(key)
+            assert key not in child
+            if gene2 is None:
+                # Excess or disjoint gene; copy from the fittest parent
+                child.add(gene1.copy())
             else:
                 # Matching/Homologous gene; combine genes from both parents.
-                child.add_connection(ConnectionGene.crossover(conn1, conn2))
-
-        # Inherit node genes
-        for key, node1 in parent1.nodes.items():
-            node2 = parent2.nodes.get(key)
-            assert key not in child.nodes
-            if node2 is None:
-                # Extra gene; copy from the fittest parent
-                child.add_node(node1.copy())
-            else:
-                # Matching/Homologous gene; combine genes from both parents.
-                child.add_node(NodeGene.crossover(node1, node2))
-
+                child.add(gene_type.crossover(gene1, gene2))
         return child
 
-    def add_connection(self, conn):
-        self.connections[conn.key] = conn
+    def mutate(self, config):
+        for gene in self.values():
+            gene.mutate(config)
 
-    def add_node(self, node):
-        self.nodes[node.key] = node
 
-    def create_connection(self, key, weight=None):
-        """ Create a new connection gene in the genome. """
-        new_conn = ConnectionGene.new(self.config, key, weight)
-        self.add_connection(new_conn)
-        return new_conn
+class BaseGenome:
+    def __init__(self, gid, config):
+        self.id = gid
+        self.config = config
 
-    def create_node(self, key=None):
-        """ Create a new node gene in the genome. """
-        new_node = NodeGene.new(self.config, key)
-        self.add_node(new_node)
-        return new_node
+        # self.nodes = GeneList(NodeGene)
+        # self.connections = GeneList(ConnectionGene)
+        self.nodes = GeneIndex(NodeGene)
+        self.connections = GeneIndex(ConnectionGene)
+
+    def init(self):
+        """ Initialize a genome by connecting input and output nodes. """
+        # Create input and output nodes
+        for k in self.config.input_keys:
+            self.nodes.new(k, self.config)
+        for k in self.config.output_keys:
+            self.nodes.new(k, self.config)
+
+        # Connect input nodes to output nodes
+        for k1 in self.config.input_keys:
+            for k2 in self.config.output_keys:
+                self.connections.new((k1, k2), self.config)
+
+    def crossover(self, parent1, parent2):
+        """
+        Initialize a genome by crossover from two parent genomes.
+        :param parent1: Fitter parent.
+        :param parent2: Less fit parent.
+        :return: This new child genome.
+        """
+
+        # Inherit connection genes
+        self.connections = GeneIndex.crossover(parent1.connections, parent2.connections)
+        # Inherit node genes
+        self.nodes = GeneIndex.crossover(parent1.nodes, parent2.nodes)
+
+        return self
 
     def mutate(self):
-        """ Mutates this genome """
+        """ Mutate this genome. """
 
+        # Structural mutations
         if self.config.single_structural_mutation:
             div = max(1, (self.config.node_add_prob + self.config.node_delete_prob +
                           self.config.conn_add_prob + self.config.conn_delete_prob))
@@ -112,15 +130,15 @@ class Genome:
             if random.random() < self.config.conn_delete_prob:
                 self.mutate_delete_connection()
 
-        # Mutate connection genes
-        for conn in self.connections.values():
-            conn.mutate(self.config)
-
-        # Mutate node genes (bias, response, etc.)
-        for node in self.nodes.values():
-            node.mutate(self.config)
+        # Parameter/weight mutations
+        self.connections.mutate(self.config)
+        self.nodes.mutate(self.config)
 
     def mutate_add_node(self):
+        """
+        Attempt to add a new node by splitting a connection.
+        Surer: if no connections are available, add a connection.
+        """
         if not self.connections:
             # Mutation FAIL if there are no connections to split
             # Alternative mutation: add connection instead of node
@@ -132,15 +150,18 @@ class Genome:
         conn_to_split = random.choice(list(self.connections.values()))
         conn_to_split.disable()
 
-        new_node = self.create_node()
+        new_node = self.nodes.new(next(self.config.node_key_indexer), self.config)
         i, o = conn_to_split.key
-        self.create_connection((i, new_node.key), 1)
-        self.create_connection((new_node.key, o), conn_to_split.weight)
+        self.connections.new((i, new_node.key), self.config, weight=1)
+        self.connections.new((new_node.key, o), self.config, weight=conn_to_split.weight)
 
     def mutate_add_connection(self):
         """
         Attempt to add a new connection, the only restriction being that the output
         node cannot be one of the network input pins.
+        Fails if the randomly generated connection already exists.
+        Surer: If randomly generated connection already exists, but is disabled,
+        enable it.
         """
         # Note: This allows for nodes to connect to themselves.
 
@@ -165,10 +186,11 @@ class Genome:
             return
 
         # Mutation SUCCESS
-        self.create_connection(key)
+        self.connections.new(key, self.config)
         return key
 
     def mutate_delete_node(self):
+        """ Attempt to delete a random hidden node. Fails if no hidden nodes exist. """
         # NOTE: This may? delete the only connection
 
         available_nodes = [k for k in self.nodes.keys()
@@ -195,6 +217,7 @@ class Genome:
         return del_key
 
     def mutate_delete_connection(self):
+        """ Attempt to delete a random connection. Fails if no connections exist. """
         # NOTE: This may? leave nodes with no connections
         # NOTE: This may delete the only connection
         if self.connections:
@@ -205,12 +228,6 @@ class Genome:
         # Mutation FAIL if no connections to delete
         return -1
 
-    def copy(self):
-        new_genome = Genome.new(self.config)
-        new_genome.nodes = self.nodes
-        new_genome.connections = self.connections
-        return new_genome
-
     @staticmethod
     def distance(genome1, genome2, config):
         """
@@ -219,46 +236,16 @@ class Genome:
         """
 
         # Compute node gene distance component.
-        node_distance = 0.0
-        if genome1.nodes or genome2.nodes:
-            disjoint_nodes = 0
-            for k2 in genome2.nodes:
-                if k2 not in genome1.nodes:
-                    disjoint_nodes += 1
-
-            for k1, n1 in genome1.nodes.items():
-                n2 = genome2.nodes.get(k1)
-                if n2 is None:
-                    disjoint_nodes += 1
-                else:
-                    # Homologous genes compute their own distance value.
-                    node_distance += NodeGene.distance(n1, n2, config)
-
-            max_nodes = max(len(genome1.nodes), len(genome2.nodes))
-            node_distance = (node_distance + (config.compatibility_disjoint_coefficient * disjoint_nodes)) / max_nodes
+        node_distance, disjoint_nodes = GeneIndex.compare(genome1.nodes, genome2.nodes, config)
+        node_distance += disjoint_nodes * config.compatibility_disjoint_coefficient
+        node_distance /= max(len(genome1.nodes), len(genome2.nodes))
 
         # Compute connection gene differences.
-        connection_distance = 0.0
-        if genome1.connections or genome2.connections:
-            disjoint_connections = 0
-            for k2 in genome2.connections:
-                if k2 not in genome1.connections:
-                    disjoint_connections += 1
+        connection_distance, disjoint_connections = GeneIndex.compare(genome1.connections, genome2.connections, config)
+        connection_distance += disjoint_connections * config.compatibility_disjoint_coefficient
+        connection_distance /= max(len(genome1.connections), len(genome2.connections))
 
-            for k1, c1 in genome1.connections.items():
-                c2 = genome2.connections.get(k1)
-                if c2 is None:
-                    disjoint_connections += 1
-                else:
-                    # Homologous genes compute their own distance value.
-                    connection_distance += ConnectionGene.distance(c1, c2, config)
-
-            max_conns = max(len(genome1.connections), len(genome2.connections))
-            connection_distance = (connection_distance +
-                                   (config.compatibility_disjoint_coefficient * disjoint_connections)) / max_conns
-
-        distance = node_distance + connection_distance
-        return distance
+        return node_distance + connection_distance
 
     def size(self):
         """ Returns genome 'complexity', taken to be number of nodes + number of connections """

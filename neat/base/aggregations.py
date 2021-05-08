@@ -6,7 +6,7 @@ Largely copied from NEAT-Python.
 from operator import mul
 from functools import reduce
 
-from myneat.myneat.math_util import mean, median2
+from neat.base.math_util import mean, median2
 
 
 def product_aggregation(x):  # note: 'x' is a list or other iterable

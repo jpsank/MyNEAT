@@ -3,8 +3,12 @@ __pycache__/
 
 .DS_Store
 extra/
+gol/
+.venv/
 
 todo.txt
 test3.py
 extra/population-legacy.py
 
+/extra/
+simulations/evo
