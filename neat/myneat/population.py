@@ -1,11 +1,11 @@
 """ Implements the core MyNEAT evolution algorithm. """
 
-from neat.base.population import BasePopulation
+from neat.base import BasePopulation
 
-from neat.myneat.genome import Genome
-from neat.myneat.species import SpeciesSet, Species
-from neat.myneat.agent import EntityAgent
-from neat.myneat.config import Config
+from .genome import Genome
+from .species import SpeciesSet, Species
+from .agent import EntityAgent
+from .config import Config
 
 
 class Population(BasePopulation):
@@ -89,12 +89,12 @@ class Population(BasePopulation):
         # Replace (reproduction step)
         if self.ticks % self.config.replacement_frequency == 0:
             self.do_replacement()
-            print("Replacement")
+            # print("Replacement")
 
             # Reorganization (speciation step)
             if self.replacements % self.config.reorganization_frequency == 0:
                 self.do_reorganization()
-                print("Reorganization")
+                # print("Reorganization")
 
             self.replacements += 1
 

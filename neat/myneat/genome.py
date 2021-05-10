@@ -1,4 +1,5 @@
-from neat.base.genome import BaseGenome, GeneIndex
+from neat.base import BaseGenome
+from neat.base.genome import GeneIndex
 
 from dataclasses import dataclass
 import random

@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 pyglet = "*"
 numpy = "*"
+gym = "*"
+shapely = "*"
 
 [requires]
 python_version = "3.8"

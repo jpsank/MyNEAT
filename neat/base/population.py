@@ -45,6 +45,7 @@ class BasePopulation:
 
     def init(self, genomes=None):
         """ Initialize agents and species """
+        self.agents.clear()
         if genomes is None:
             for _ in range(self.config.pop_size):
                 self.agents.add(self.agent_type(self.new_genome()))

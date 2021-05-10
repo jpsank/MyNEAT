@@ -48,7 +48,7 @@ class GeneIndex(Index):
         """
         assert (gene_type := parent1.gene_type) == parent2.gene_type
         child = GeneIndex(gene_type)
-        for key, gene1 in parent1.genes.items():
+        for key, gene1 in parent1.items():
             gene2 = parent2.get(key)
             assert key not in child
             if gene2 is None:
@@ -236,14 +236,18 @@ class BaseGenome:
         """
 
         # Compute node gene distance component.
-        node_distance, disjoint_nodes = GeneIndex.compare(genome1.nodes, genome2.nodes, config)
-        node_distance += disjoint_nodes * config.compatibility_disjoint_coefficient
-        node_distance /= max(len(genome1.nodes), len(genome2.nodes))
+        node_distance = 0
+        if genome1.nodes or genome2.nodes:
+            node_distance, disjoint_nodes = GeneIndex.compare(genome1.nodes, genome2.nodes, config)
+            node_distance += disjoint_nodes * config.compatibility_disjoint_coefficient
+            node_distance /= max(len(genome1.nodes), len(genome2.nodes))
 
         # Compute connection gene differences.
-        connection_distance, disjoint_connections = GeneIndex.compare(genome1.connections, genome2.connections, config)
-        connection_distance += disjoint_connections * config.compatibility_disjoint_coefficient
-        connection_distance /= max(len(genome1.connections), len(genome2.connections))
+        connection_distance = 0
+        if genome1.connections or genome2.connections:
+            connection_distance, disjoint_connections = GeneIndex.compare(genome1.connections, genome2.connections, config)
+            connection_distance += disjoint_connections * config.compatibility_disjoint_coefficient
+            connection_distance /= max(len(genome1.connections), len(genome2.connections))
 
         return node_distance + connection_distance
 

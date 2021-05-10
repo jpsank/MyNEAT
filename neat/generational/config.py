@@ -2,7 +2,8 @@
 Contains configuration for realtime NEAT
 """
 
-from neat.base.config import FloatConfig, BoolConfig, StringConfig, BaseConfig
+from neat.base import BaseConfig
+from neat.base.config import FloatConfig, BoolConfig, StringConfig
 
 
 class Config(BaseConfig):

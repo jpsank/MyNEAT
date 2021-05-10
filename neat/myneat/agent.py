@@ -1,11 +1,11 @@
 
-from neat.base.population import BaseAgent
-from neat.base.nn.recurrent import RecurrentNetwork
+from neat.base import BaseAgent
+from neat.base.nn import RecurrentNetwork
 
-from neat.myneat.world import *
+from .world import *
 
 
-class EntityAgent(Entity, BaseAgent):
+class EntityAgent(BaseAgent, Entity):
     def __init__(self, genome):
         BaseAgent.__init__(self, genome)
 
@@ -21,8 +21,8 @@ class EntityAgent(Entity, BaseAgent):
 
     def draw(self, batch):
         yield super(EntityAgent, self).draw(batch)
-        yield draw_line(batch, *self.shape.pos,
-                        *(self.shape.pos + self.shape.dir * self.shape.radius * 2), color=self.color)
+        yield draw_line(*self.shape.pos, *(self.shape.pos + self.shape.dir * self.shape.radius * 2),
+                        color=self.color, batch=batch)
 
     def move(self, forward, turn):
         self.shape.x += math.cos(self.shape.angle) * forward

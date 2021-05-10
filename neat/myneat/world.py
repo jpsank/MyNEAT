@@ -42,6 +42,14 @@ def circle_circle_intersect(circle1, circle2):
     return distance(*circle1.pos, *circle2.pos) <= circle1.radius + circle2.radius
 
 
+def angle_between(x1, y1, x2, y2):
+    return math.atan2(y2-y1, x2-x1)
+
+
+def angle_diff(a1, a2):
+    return (a1 % 2*math.pi) - (a2 % 2*math.pi)
+
+
 def distance(x1, y1, x2, y2):
     return math.sqrt((x1-x2)**2 + (y1-y2)**2)
 
@@ -51,9 +59,6 @@ class Shape(ABC):
     x: float
     y: float
     angle: float
-
-    @property
-    def radius(self): return
 
     @property
     def dir(self):

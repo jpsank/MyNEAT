@@ -1,4 +1,4 @@
-from neat.base.species import BaseSpeciesSet, BaseSpecies
+from neat.base import BaseSpeciesSet, BaseSpecies
 
 
 class Species(BaseSpecies):

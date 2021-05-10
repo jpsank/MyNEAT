@@ -1,9 +1,8 @@
 """ Implements the core NEAT evolution algorithm. """
 
-from neat.base.population import BasePopulation, BaseAgent
-from neat.base.genome import BaseGenome
-from neat.base.species import BaseSpeciesSet, BaseSpecies
-from neat.generational.config import Config
+from neat.base.nn import RecurrentNetwork
+from neat.base import BasePopulation, BaseSpeciesSet, BaseSpecies, BaseAgent, BaseGenome
+from .config import Config
 
 
 class Population(BasePopulation):
@@ -21,23 +20,22 @@ class Population(BasePopulation):
         # Evaluate individuals and assign score
         for agent in self.agents.values():
             agent.fitness = evaluate_fitness(agent)
-            if self.fittest is None or agent.adjusted_fitness() > self.fittest.fitness:
+            if self.fittest is None or agent.fitness > self.fittest.fitness:
                 self.fittest = agent
 
         next_gen_genomes = []
 
         # Put best genomes from each species into next generation
         for species in self.species_set.index.values():
-            sorted_members = sorted(species.members, key=lambda m: m.fitness, reverse=True)
-            fittest_in_species = sorted_members[0]
+            fittest_in_species = max(species.members, key=lambda m: m.fitness)
             next_gen_genomes.append(fittest_in_species.genome)
 
         # Breed the rest of the genomes
         while len(next_gen_genomes) < self.config.pop_size:
             # Choose a species probabilistically based on average fitness
-            species = self.species_set.random_species(1)
+            parent_species = self.species_set.random_species()
             # Choose two parent agents from that species probabilistically based on fitness
-            parent1, parent2 = species.random_members(2)
+            parent1, parent2 = parent_species.random_members(2)
 
             # Crossover genomes
             if parent1.fitness < parent2.fitness:  # parent1 must be fitter parent
@@ -50,5 +48,5 @@ class Population(BasePopulation):
 
             next_gen_genomes.append(child_genome)
 
-        self.init(next_gen_genomes)
+        return next_gen_genomes
 

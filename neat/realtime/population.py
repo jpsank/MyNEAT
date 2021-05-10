@@ -1,33 +1,15 @@
 """ Implements the core rt-NEAT evolution algorithm. """
 
-from neat.base.genome import BaseGenome
-from neat.base.species import BaseSpeciesSet, BaseSpecies
-from neat.base.population import BasePopulation, BaseAgent
-from neat.realtime.config import Config
-
-
-class Species(BaseSpecies):
-    pass
-
-
-class SpeciesSet(BaseSpeciesSet):
-    pass
-
-
-class Agent(BaseAgent):
-    pass
-
-
-class Genome(BaseGenome):
-    pass
+from neat.base import BasePopulation, BaseSpeciesSet, BaseSpecies, BaseAgent, BaseGenome
+from .config import Config
 
 
 class Population(BasePopulation):
     """
     A group of individuals capable of evolving
     """
-    def __init__(self, config: Config, species_set_type=SpeciesSet, species_type=Species,
-                 agent_type=Agent, genome_type=Genome):
+    def __init__(self, config: Config, species_set_type=BaseSpeciesSet, species_type=BaseSpecies,
+                 agent_type=BaseAgent, genome_type=BaseGenome):
         super().__init__(config, species_set_type=species_set_type, species_type=species_type,
                          agent_type=agent_type, genome_type=genome_type)
         self.replacements = 0
@@ -55,7 +37,7 @@ class Population(BasePopulation):
         # Crossover genomes
         if parent1.fitness < parent2.fitness:  # parent1 must be fitter parent
             parent2, parent1 = parent1, parent2
-        child_genome = Genome(next(self.gid_indexer), self.config)
+        child_genome = self.genome_type(next(self.gid_indexer), self.config)
         child_genome.crossover(parent1.genome, parent2.genome)
 
         # Mutate genome
@@ -81,12 +63,6 @@ class Population(BasePopulation):
         # Remove any empty species (cleanup routine)
         # After reassigning, some empty species may be left, so delete them
         self.species_set.remove_empty()
-
-    def remove_species(self, sid):
-        s = self.species_set.dict[sid]
-        for member in s.members:
-            self.agents.remove(member)
-        del self.species_set.dict[sid]
 
     def update(self):
         """ Call every tick of simulation. Assumes agents have already been evaluated and fitness assigned """

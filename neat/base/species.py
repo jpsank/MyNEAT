@@ -123,7 +123,10 @@ class BaseSpeciesSet:
     def random_species(self, k=1):
         """ Choose species probabilistically based on average fitness """
         all_species = list(self.index.values())
-        return random.choices(all_species, weights=[s.avg_fitness() for s in all_species], k=k)
+        choices = random.choices(all_species, weights=[s.avg_fitness() for s in all_species], k=k)
+        if k == 1:
+            return choices[0]
+        return choices
 
     def size(self):
         return len(self.index)

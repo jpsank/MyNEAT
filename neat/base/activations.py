@@ -81,7 +81,7 @@ activation_defs = {
     "sigmoid": sigmoid_activation,
     "tanh": tanh_activation,
     "sin": sin_activation,
-    "guass": gauss_activation,
+    "gauss": gauss_activation,
     "relu": relu_activation,
     "softplus": softplus_activation,
     "identity": identity_activation,
