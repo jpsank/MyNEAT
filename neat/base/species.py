@@ -46,8 +46,11 @@ class BaseSpecies:
         self.members.add(m)
         m.species = self
 
+    def get_fitnesses(self):
+        """ Return fitnesses of members """
+        return [m.fitness for m in self.members]
+
     def avg_fitness(self):
-        """ Return average fitness of members """
         return sum(m.fitness for m in self.members) / len(self.members)
 
     def reset(self):

@@ -1,4 +1,4 @@
-""" Phenome generation (not yet implemented). """
+""" Heavily influenced by NEAT-Python """
 
 from collections import defaultdict
 
@@ -6,33 +6,7 @@ from neat.base.genome import BaseGenome
 from neat.base.activations import activation_defs
 from neat.base.aggregations import aggregation_defs
 
-
-def required_for_output(inputs, outputs, connections):
-    """
-    Collect the nodes whose state is required to compute the final network output(s).
-    :param inputs: list of the input identifiers
-    :param outputs: list of the output node identifiers
-    :param connections: list of (input, output) connections in the network.
-    NOTE: It is assumed that the input identifier set and the node identifier set are disjoint.
-    By convention, the output node ids are always the same as the output index.
-    Returns a set of identifiers of required nodes, not including inputs.
-    """
-
-    # This process is analogous to an infection, starting at the output nodes and iterating backwards,
-    # "infecting" nodes that connect to other infected nodes. Thus, nodes that do not connect to an
-    # eventual output will avoid infection; these nodes are Not Required.
-
-    infected = set(outputs)
-    while True:
-        # Newly infect nodes that connect to an already-infected node
-        nodes_to_infect = set(a for (a, b) in connections if a not in infected and b in infected)
-        if not nodes_to_infect:
-            # No more new nodes that connect to an eventual output. Done iterating backwards
-            break
-
-        infected = infected.union(nodes_to_infect)
-
-    return infected - set(inputs)
+from .graphs import required_for_output
 
 
 class RecurrentNetwork:
@@ -51,7 +25,7 @@ class RecurrentNetwork:
         self.o_values = dict(self.i_values)
 
     @staticmethod
-    def new(genome: BaseGenome):
+    def create(genome: BaseGenome):
         """ Receives a genome and returns its phenotype (a RecurrentNetwork). """
         required = required_for_output(genome.config.input_keys, genome.config.output_keys, genome.connections.keys())
 

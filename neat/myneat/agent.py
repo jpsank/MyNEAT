@@ -14,7 +14,7 @@ class EntityAgent(BaseAgent, Entity):
         r, g, b = (int(gene.value*255) for gene in (r, g, b))
         Entity.__init__(self, shape=AGENT_SHAPE_TYPE(**params), color=(r, g, b))
 
-        self.brain = RecurrentNetwork.new(genome)
+        self.brain = RecurrentNetwork.create(genome)
 
         self.health = 0
         self.dead = False

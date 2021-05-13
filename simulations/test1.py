@@ -1,11 +1,11 @@
 """ Demonstrate functionality of evolution algorithm without phenome generation. """
 
-from neat.realtime.population import Agent, Population
+from neat.realtime.population import Population
 from neat.realtime.config import Config
 
 
 config = Config()
-population = Population(config, Agent)
+population = Population(config)
 population.init()
 
 
@@ -30,7 +30,7 @@ while True:
 
     print(f"Fittest conns: {len(population.fittest.genome.connections)}, "
           f"enabled: {len([c for c in population.fittest.genome.connections.values() if c.enabled])}, "
-          f"nodes: {len(population.fittest.genome.nodes)}, Species: {len(population.species_set.dict)}, "
+          f"nodes: {len(population.fittest.genome.nodes)}, Species: {len(population.species_set.index)}, "
           f"Pop: {len(population.agents)}, ")
     print("\t" + ", ".join(f"{k[0]}->{k[1]}" for k in population.fittest.genome.connections.keys()))
     gen += 1

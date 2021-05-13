@@ -7,6 +7,7 @@ Configuration parameters themselves are largely copied from NEAT-Python.
 from itertools import count
 from dataclasses import dataclass
 import random
+from .math_util import mean
 
 
 def clamp(value, low, high):
@@ -112,6 +113,10 @@ class BaseConfig:
         replace_rate=0.1
     )
 
+    # genome compatibility options
+    compatibility_disjoint_coefficient = 1.0  # c2, takes the place of both c1 and c2
+    compatibility_weight_coefficient = 0.5  # c3
+
     # connection add/remove rates
     conn_add_prob = 0.5
     conn_delete_prob = 0.5
@@ -145,10 +150,6 @@ class BaseConfig:
         replace_rate=0.0
     )
 
-    # structural mutations
-    single_structural_mutation = False  # If enabled, only one structural mutation per genome per "generation"
-    structural_mutation_surer = False  # If enabled, perform alternative structural mutations on failure
-
     # connection weight options
     weight_config = FloatConfig(
         init_mean=0.0,
@@ -160,9 +161,9 @@ class BaseConfig:
         replace_rate=0.1
     )
 
-    # genome compatibility options
-    compatibility_disjoint_coefficient = 1.0  # c2, takes the place of both c1 and c2
-    compatibility_weight_coefficient = 0.5  # c3
+    # structural mutations
+    single_structural_mutation = False  # If enabled, only one structural mutation per genome per "generation"
+    structural_mutation_surer = False  # If enabled, perform alternative structural mutations on failure
 
     # dynamic compatibility threshold
     compat_threshold_initial = 3.0  # initial compatibility threshold value
@@ -171,11 +172,17 @@ class BaseConfig:
     target_num_species = 50  # dynamic compatibility threshold used to maintain this target
 
     # stagnation
+    species_fitness_func = mean  # how to measure fitness of a species based on its members' fitness (for stagnation)
     max_stagnation = 15  # how long before a species can be removed for not improving its species-fitness (15)
     species_elitism = 0  # number of species with highest species-fitness are protected from stagnation
     reset_on_extinction = True  # init new population if all species simultaneously become extinct due to stagnation
 
-    pop_size = 100
+    # reproduction NOT IMPLEMENTED
+    elitism = 0  # The number of most-fit individuals in each species to be preserved as-is from one generation to next
+    survival_threshold = 0.2  # The fraction of members for each species allowed to reproduce each generation
+    min_species_size = 2  # The minimum number of genomes per species after reproduction
+
+    pop_size = 150
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():

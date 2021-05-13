@@ -1,6 +1,6 @@
 
 from neat.realtime import Config, BaseAgent, BaseGenome, Population
-from neat.base.nn import RecurrentNetwork
+from neat.base.nn import FeedForwardNetwork
 
 from shapely.geometry import LineString
 from shapely.geometry import Point
@@ -108,7 +108,7 @@ window = pyglet.window.Window(WIDTH, HEIGHT)
 class Shooter(BaseAgent, Entity):
     def __init__(self, genome):
         BaseAgent.__init__(self, genome)
-        self.brain = RecurrentNetwork.new(genome)
+        self.brain = FeedForwardNetwork.create(genome)
         Entity.__init__(self, random.random()*WIDTH, random.random()*HEIGHT, 0)
 
         self.vx, self.vy = 0, 0
@@ -275,7 +275,7 @@ class Game:
             yield from agent.draw(x, y)
 
 
-config = Config(num_inputs=4, num_outputs=4, max_stagnation=100, pop_size=128, target_num_species=20)
+config = Config(num_inputs=4, num_outputs=4, max_stagnation=500, pop_size=128, target_num_species=20)
 population = Population(config, agent_type=Shooter)
 population.init()
 

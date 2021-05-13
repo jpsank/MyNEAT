@@ -1,6 +1,5 @@
 """ Implements the core NEAT evolution algorithm. """
 
-from neat.base.nn import RecurrentNetwork
 from neat.base import BasePopulation, BaseSpeciesSet, BaseSpecies, BaseAgent, BaseGenome
 from .config import Config
 
@@ -14,12 +13,14 @@ class Population(BasePopulation):
         super().__init__(config, species_set_type=species_set_type, species_type=species_type,
                          agent_type=agent_type, genome_type=genome_type)
 
-    def evaluate(self, evaluate_fitness):
+    def evaluate(self, fitness_function=None):
         self.species_set.speciate(self.agents)
 
         # Evaluate individuals and assign score
         for agent in self.agents.values():
-            agent.fitness = evaluate_fitness(agent)
+            # If no fitness function provided, do not assign fitness
+            if fitness_function:
+                agent.fitness = fitness_function(agent)
             if self.fittest is None or agent.fitness > self.fittest.fitness:
                 self.fittest = agent
 

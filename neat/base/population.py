@@ -66,7 +66,7 @@ class BasePopulation:
         # Update species' best average fitness
         all_species = self.species_set.index.values()
         for species in all_species:
-            fitness = species.avg_fitness()
+            fitness = self.config.species_fitness_func(species.get_fitnesses())
             if species.best_fitness is None or fitness > species.best_fitness:
                 species.best_fitness = fitness
                 species.last_improved = self.ticks
