@@ -11,7 +11,6 @@ test3.py
 extra/population-legacy.py
 
 /extra/
-simulations/evo
+tests/evo
 /longdpole/
-/simulations/art/save/
-/longdpole/
+/tests/art/save/

@@ -168,7 +168,7 @@ class Simulation:
 
 if __name__ == '__main__':
     config = Config(num_inputs=5, num_outputs=3, pop_size=16, target_num_species=8)
-    # sin gauss identity sigmoid cube exp hat inv log softplus square tanh
+    config.activation_config.options = "sin gauss identity sigmoid cube exp hat inv log softplus square tanh".split()
     print("Initializing simulation...")
     sim = Simulation(config)
     print("Running simulation...")
