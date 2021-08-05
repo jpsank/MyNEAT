@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/extra/gol/patterns" />
+      <excludeFolder url="file://$MODULE_DIR$/longdpole" />
+      <excludeFolder url="file://$MODULE_DIR$/extra" />
     </content>
     <orderEntry type="jdk" jdkName="Pipenv (MyNEAT)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

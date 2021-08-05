@@ -7,7 +7,6 @@ Configuration parameters themselves are largely copied from NEAT-Python.
 from itertools import count
 from dataclasses import dataclass
 import random
-from .math_util import mean
 
 
 def clamp(value, low, high):
@@ -172,7 +171,7 @@ class BaseConfig:
     target_num_species = 50  # dynamic compatibility threshold used to maintain this target
 
     # stagnation
-    species_fitness_func = mean  # how to measure fitness of a species based on its members' fitness (for stagnation)
+    species_fitness_func = "mean"  # how to measure fitness of a species based on its members' fitness (for stagnation)
     max_stagnation = 15  # how long before a species can be removed for not improving its species-fitness (15)
     species_elitism = 0  # number of species with highest species-fitness are protected from stagnation
     reset_on_extinction = True  # init new population if all species simultaneously become extinct due to stagnation

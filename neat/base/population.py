@@ -3,6 +3,7 @@
 from neat.base.genome import BaseGenome
 from neat.base.species import BaseSpeciesSet, BaseSpecies
 from neat.base.data import Index
+from neat.base.math_util import stat_functions
 
 from itertools import count
 
@@ -66,7 +67,7 @@ class BasePopulation:
         # Update species' best average fitness
         all_species = self.species_set.index.values()
         for species in all_species:
-            fitness = self.config.species_fitness_func(species.get_fitnesses())
+            fitness = stat_functions[self.config.species_fitness_func](species.get_fitnesses())
             if species.best_fitness is None or fitness > species.best_fitness:
                 species.best_fitness = fitness
                 species.last_improved = self.ticks
