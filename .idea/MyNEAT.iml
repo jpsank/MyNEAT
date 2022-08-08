@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/longdpole" />
       <excludeFolder url="file://$MODULE_DIR$/extra" />
     </content>
-    <orderEntry type="jdk" jdkName="Pipenv (MyNEAT)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Pipenv (MyNEAT) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

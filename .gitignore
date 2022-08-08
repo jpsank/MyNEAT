@@ -1,17 +1,22 @@
 
 __pycache__/
 .idea/
+.vscode/
 
 .DS_Store
 extra/
 gol/
 .venv/
 
+net.html
 todo.txt
 test3.py
 extra/population-legacy.py
 
-/extra/
+extra/
 tests/evo
-/longdpole/
-/tests/art/save/
+longdpole/
+tests/art/save/
+old/
+
+

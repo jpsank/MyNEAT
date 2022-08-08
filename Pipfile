@@ -11,6 +11,11 @@ numpy = "*"
 gym = "*"
 shapely = "*"
 pygame = "*"
+pyvis = "*"
+networkx = "*"
+matplotlib = "*"
+sqlalchemy = "*"
+box2d = "*"
 
 [requires]
 python_version = "3.8"
